@@ -31,7 +31,7 @@ npm run preview
 ## What you can do
 
 - Drag any step, including the success and failure branches.
-- Pull a circle handle to connect two steps. The canvas refuses self-links, links into the trigger, links into a branch, links out of the business-hours step itself, duplicates, and loops.
+- Pull a circle handle onto another step to connect them. A drop near the top of the card counts. The canvas refuses self-links, links into the trigger, links into a branch, links out of the business-hours step itself, duplicates, and loops, and says why the link was refused.
 - Press Delete to remove a selected connection. The two edges from a business-hours step to its branches stay in place.
 - **Create New Node** asks for a title, description, and type: Send Message (`sendMessage`), Add Comments (`addComment`), or Business Hours (`businessHours`).
 - A business-hours step also adds Success and Failure nodes. Those nodes are visible only. Clicking them does not open a drawer, and a direct URL such as `/nodes/node-hours-success` returns to the canvas.
@@ -79,7 +79,7 @@ queryClientConfig: {
 
 `staleTime: Infinity` keeps the loaded payload from being refetched in the background. Mutations use `networkMode: 'always'` as well, so a save still runs when the browser reports itself offline. There is no remote API: the first load reads `public/payload.json`, and later loads read the local copy written by mutations.
 
-Vue Flow is controlled (`apply-default` is off). Position changes are applied locally while a node is dragged and written to the store only when the drag ends, so the payload is not rewritten on every pointer move. Node measurements are kept on the same object when the graph membership has not changed, which keeps the viewport steady while a drawer field updates.
+Vue Flow applies a drag to its own node positions. The store records the new position only when the drag ends, so the payload is not rewritten on every pointer move. While a node is moving, store sync leaves that position alone. Node measurements are kept on the same object when the graph membership has not changed, which keeps the viewport steady while a drawer field updates.
 
 The canvas route and the `/nodes/:nodeId` route render the same page component. Opening a drawer changes the URL and slides the panel in without remounting the graph.
 

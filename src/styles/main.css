@@ -243,8 +243,8 @@ input:focus, textarea:focus, select:focus {
 }
 
 .vue-flow__handle {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   background: #fff;
   border: 2px solid #ff7a59;
   box-shadow: 0 0 0 2px #fff;

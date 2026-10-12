@@ -4,6 +4,7 @@ import {
   buildNodeBundle,
   canConnect,
   drawerRouteState,
+  isGraphConnectionValid,
   isNodeAccessible,
   nextNodePosition,
   normalizePayload,
@@ -97,6 +98,13 @@ describe('graph editing', () => {
       sourceHandle: 'out',
     }, base.nodes, base.edges).ok).toBe(false)
     expect(canConnect({ source: 'node-welcome', target: 'node-comment', sourceHandle: 'out' }, base.nodes, base.edges).ok).toBe(true)
+    const existing = base.edges.find((edge) => edge.id === 'edge-trigger-hours')
+    expect(isGraphConnectionValid(existing, base.nodes, base.edges)).toBe(true)
+    expect(isGraphConnectionValid({
+      source: 'node-away',
+      target: 'node-comment',
+      sourceHandle: 'out',
+    }, base.nodes, base.edges)).toBe(false)
   })
 })
 

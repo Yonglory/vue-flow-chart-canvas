@@ -1,13 +1,7 @@
 <script setup>
-import { markRaw, nextTick, ref, watch } from 'vue'
+import { markRaw, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import {
-  Panel,
-  VueFlow,
-  applyEdgeChanges,
-  applyNodeChanges,
-  useVueFlow,
-} from '@vue-flow/core'
+import { ConnectionMode, Panel, VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
@@ -15,14 +9,14 @@ import OutcomeNode from '@/components/canvas/nodes/OutcomeNode.vue'
 import WorkflowNode from '@/components/canvas/nodes/WorkflowNode.vue'
 import { useFlowStore } from '@/stores/flowStore'
 import { useToastStore } from '@/stores/toastStore'
-import { canConnect, miniMapColor, reconcileEdges, reconcileNodes } from '@/utils/flow'
+import { canConnect, isGraphConnectionValid, miniMapColor, reconcileEdges, reconcileNodes } from '@/utils/flow'
 
 const emit = defineEmits(['node-click', 'pane-click', 'ready', 'create', 'persist'])
 
 const route = useRoute()
 const store = useFlowStore()
 const toast = useToastStore()
-const { fitView } = useVueFlow()
+const { fitView, connectionStatus, connectionStartHandle, connectionEndHandle } = useVueFlow()
 
 const nodeTypes = {
   trigger: markRaw(WorkflowNode),
@@ -35,7 +29,6 @@ const nodeTypes = {
 const flowNodes = ref([])
 const flowEdges = ref([])
 const draggingId = ref(null)
-let syncing = false
 
 function selectedId() {
   const id = route.params.nodeId
@@ -43,39 +36,28 @@ function selectedId() {
 }
 
 function syncFromStore() {
-  syncing = true
   flowNodes.value = reconcileNodes(flowNodes.value, store.nodes, {
     selectedId: selectedId(),
     draggingId: draggingId.value,
   })
   flowEdges.value = reconcileEdges(flowEdges.value, store.edges)
-  nextTick(() => {
-    syncing = false
-  })
 }
 
 watch(() => [store.revision, route.params.nodeId], syncFromStore, { immediate: true })
 
-function onNodesChange(changes) {
-  const activeDrag = changes.find((change) => change.type === 'position' && change.dragging)
-  if (activeDrag) draggingId.value = activeDrag.id
-  flowNodes.value = applyNodeChanges(changes, flowNodes.value)
-  if (syncing) return
-  const ended = changes.filter((change) => (
-    change.type === 'position' && change.dragging === false && change.position
-  ))
-  if (!ended.length) return
+function onDragStart(payload) {
+  draggingId.value = payload?.node?.id || null
+}
+
+function onDragStop(payload) {
+  const moved = payload?.nodes?.length ? payload.nodes : [payload?.node].filter(Boolean)
+  const changed = moved.some((node) => store.updateNodePosition(node.id, node.position))
   draggingId.value = null
-  const moved = ended.some((change) => store.updateNodePosition(change.id, change.position))
-  if (moved) emit('persist')
+  if (changed) emit('persist')
 }
 
 function onEdgesChange(changes) {
-  const lockedIds = new Set(store.edges.filter((edge) => edge.data?.locked).map((edge) => edge.id))
-  const allowed = changes.filter((change) => !(change.type === 'remove' && lockedIds.has(change.id)))
-  flowEdges.value = applyEdgeChanges(allowed, flowEdges.value)
-  if (syncing) return
-  const removed = allowed.filter((change) => change.type === 'remove')
+  const removed = changes.filter((change) => change.type === 'remove')
   if (!removed.length) return
   const changed = removed.some((change) => store.removeEdge(change.id))
   if (changed) emit('persist')
@@ -92,7 +74,30 @@ function onConnect(connection) {
 }
 
 function isValidConnection(connection) {
-  return canConnect(connection, store.nodes, store.edges).ok
+  return isGraphConnectionValid(connection, store.nodes, store.edges)
+}
+
+function onConnectEnd() {
+  if (connectionStatus.value !== 'invalid') return
+  const start = connectionStartHandle.value
+  const end = connectionEndHandle.value
+  if (!start?.nodeId || !end?.nodeId) return
+  const fromSource = start.type !== 'target'
+  const connection = fromSource
+    ? {
+      source: start.nodeId,
+      sourceHandle: start.id,
+      target: end.nodeId,
+      targetHandle: end.id,
+    }
+    : {
+      source: end.nodeId,
+      sourceHandle: end.id,
+      target: start.nodeId,
+      targetHandle: start.id,
+    }
+  const result = canConnect(connection, store.nodes, store.edges)
+  toast.error(result.ok ? 'That connection is not allowed.' : result.reason)
 }
 
 function onNodeClick(payload) {
@@ -126,7 +131,6 @@ defineExpose({ focusNode, syncFromStore })
       :nodes="flowNodes"
       :edges="flowEdges"
       :node-types="nodeTypes"
-      :apply-default="false"
       :delete-key-code="'Delete'"
       :is-valid-connection="isValidConnection"
       :connection-line-options="{ style: { stroke: '#ff7a59', strokeWidth: 2 } }"
@@ -134,10 +138,14 @@ defineExpose({ focusNode, syncFromStore })
       :min-zoom="0.35"
       :max-zoom="1.6"
       :nodes-draggable="true"
+      :connection-mode="ConnectionMode.Loose"
+      :connection-radius="80"
       elevate-nodes-on-select
-      @nodes-change="onNodesChange"
+      @node-drag-start="onDragStart"
+      @node-drag-stop="onDragStop"
       @edges-change="onEdgesChange"
       @connect="onConnect"
+      @connect-end="onConnectEnd"
       @node-click="onNodeClick"
       @pane-click="onPaneClick"
       @init="onReady"

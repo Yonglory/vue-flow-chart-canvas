@@ -155,6 +155,11 @@ export function wouldCycle(edges, source, target) {
   return false
 }
 
+export function isGraphConnectionValid(connection, nodes, edges) {
+  if (connection?.id && (edges || []).some((edge) => edge.id === connection.id)) return true
+  return canConnect(connection, nodes, edges).ok
+}
+
 export function canConnect(connection, nodes, edges) {
   if (!connection?.source) return { ok: false, reason: 'Choose a step to connect from.' }
   if (!connection.target) return { ok: true }
