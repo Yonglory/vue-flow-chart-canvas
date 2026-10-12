@@ -232,7 +232,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .canvas-hint {
-  margin: 0 0 8px;
+  margin: 8px 0 0 8px;
   padding: 7px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);

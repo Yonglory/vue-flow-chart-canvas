@@ -113,7 +113,7 @@ function onReady() {
   if (id && store.nodeById(id)) {
     fitView({ nodes: [id], padding: 0.45, duration: 450 })
   } else {
-    fitView({ padding: 0.22, duration: 450 })
+    fitView({ padding: 0.28, duration: 450 })
   }
   emit('ready')
 }
@@ -159,7 +159,7 @@ defineExpose({ focusNode, syncFromStore })
         :node-color="miniMapColor"
         mask-color="rgba(245, 246, 248, 0.72)"
       />
-      <Panel position="bottom-center">
+      <Panel position="top-left">
         <p class="canvas-hint">Drag a step to move it. Pull a circle handle to connect steps.</p>
       </Panel>
     </VueFlow>
