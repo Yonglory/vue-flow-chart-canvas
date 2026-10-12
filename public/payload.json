@@ -1,0 +1,146 @@
+{
+  "nodes": [
+    {
+      "id": "node-trigger",
+      "type": "trigger",
+      "position": { "x": 300, "y": 0 },
+      "data": {
+        "title": "Trigger",
+        "description": "Conversation Opened"
+      }
+    },
+    {
+      "id": "node-hours",
+      "type": "businessHours",
+      "position": { "x": 300, "y": 170 },
+      "data": {
+        "title": "Business Hours",
+        "description": "Business Hours - UTC",
+        "timezone": "UTC",
+        "schedule": [
+          { "day": "mon", "label": "Mon", "enabled": true, "start": "09:00", "end": "17:00" },
+          { "day": "tue", "label": "Tue", "enabled": true, "start": "09:00", "end": "17:00" },
+          { "day": "wed", "label": "Wed", "enabled": true, "start": "09:00", "end": "17:00" },
+          { "day": "thu", "label": "Thu", "enabled": true, "start": "09:00", "end": "17:00" },
+          { "day": "fri", "label": "Fri", "enabled": true, "start": "09:00", "end": "17:00" },
+          { "day": "sat", "label": "Sat", "enabled": true, "start": "09:00", "end": "17:00" },
+          { "day": "sun", "label": "Sun", "enabled": true, "start": "09:00", "end": "17:00" }
+        ]
+      }
+    },
+    {
+      "id": "node-hours-success",
+      "type": "outcome",
+      "position": { "x": 104, "y": 390 },
+      "data": {
+        "title": "Success",
+        "description": "During business hours",
+        "outcome": "success",
+        "parentId": "node-hours",
+        "accessible": false
+      }
+    },
+    {
+      "id": "node-hours-failure",
+      "type": "outcome",
+      "position": { "x": 504, "y": 390 },
+      "data": {
+        "title": "Failure",
+        "description": "Outside business hours",
+        "outcome": "failure",
+        "parentId": "node-hours",
+        "accessible": false
+      }
+    },
+    {
+      "id": "node-welcome",
+      "type": "sendMessage",
+      "position": { "x": 40, "y": 500 },
+      "data": {
+        "title": "Welcome Message",
+        "description": "Thanks for reaching out. A teammate will be with you shortly.",
+        "texts": [
+          "Thanks for reaching out. A teammate will be with you shortly."
+        ],
+        "attachments": [
+          {
+            "id": "att-welcome",
+            "name": "0f642f52e639febd6ba5a27453cc8345.png",
+            "mimeType": "image/png",
+            "size": 15109,
+            "url": "/attachments/0f642f52e639febd6ba5a27453cc8345.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node-away",
+      "type": "sendMessage",
+      "position": { "x": 440, "y": 500 },
+      "data": {
+        "title": "Away Message",
+        "description": "Sorry, we are currently away. We will respond as soon as possible.",
+        "texts": [
+          "Sorry, we are currently away. We will respond as soon as possible."
+        ],
+        "attachments": []
+      }
+    },
+    {
+      "id": "node-comment",
+      "type": "addComment",
+      "position": { "x": 440, "y": 740 },
+      "data": {
+        "title": "Add Comment #1",
+        "description": "User message during off hours",
+        "comment": "User message during off hours"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-trigger-hours",
+      "source": "node-trigger",
+      "target": "node-hours",
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "edge-hours-success",
+      "source": "node-hours",
+      "target": "node-hours-success",
+      "sourceHandle": "success",
+      "targetHandle": "in",
+      "data": { "locked": true }
+    },
+    {
+      "id": "edge-hours-failure",
+      "source": "node-hours",
+      "target": "node-hours-failure",
+      "sourceHandle": "failure",
+      "targetHandle": "in",
+      "data": { "locked": true }
+    },
+    {
+      "id": "edge-success-welcome",
+      "source": "node-hours-success",
+      "target": "node-welcome",
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "edge-failure-away",
+      "source": "node-hours-failure",
+      "target": "node-away",
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    },
+    {
+      "id": "edge-away-comment",
+      "source": "node-away",
+      "target": "node-comment",
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    }
+  ]
+}
