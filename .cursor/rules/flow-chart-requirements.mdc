@@ -1,0 +1,46 @@
+---
+description: Strict requirements for the Vue 3 flow chart canvas
+alwaysApply: true
+---
+
+# Flow chart requirements
+
+Follow these constraints on every change in this repository.
+
+## Language and libraries
+
+- JavaScript / ES6 and Vue 3 `<script setup>` only. Do not add TypeScript.
+- Canvas rendering uses [Vue Flow](https://github.com/bcakmakoglu/vue-flow): `@vue-flow/core`, `@vue-flow/background`, `@vue-flow/controls`, `@vue-flow/minimap`. Do not replace `<VueFlow>` with a hand-rolled graph, and do not copy example source from that repository.
+- Fetching and mutations use [TanStack Query v5](https://tanstack.com/query/v5) through `@tanstack/vue-query`. Do not use `@tanstack/react-query`, Vue Query v4, or `cacheTime`.
+- Keep this query client config exact:
+
+```js
+queryClientConfig: {
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      networkMode: 'always',
+      staleTime: Infinity,
+      gcTime: 60 * 60 * 1000,
+    },
+  },
+}
+```
+
+- Pinia stores the graph, positions, selection, and undo history. Vue Router owns `/` and `/nodes/:nodeId`.
+
+## Payload
+
+- Preserve stored ids and `parentId` types. The trigger id is the number `1`. Other ids are strings. Compare with `String()` only at the Vue Flow boundary.
+- Create-form values map as `sendMessage` → `sendMessage`, `addComments` → `addComment`, `businessHours` → `dateTime` with `data.action: "businessHours"` plus success and failure `dateTimeConnector` children.
+- `dateTimeConnector` nodes are display-only. Do not open a drawer, do not select them as edit targets, and redirect direct visits to `/`.
+- Do not delete the trigger. Deleting a node removes its subtree.
+- Put shared helpers in `src/utils/`. Keep components free of layout math, id generation, and validation rules.
+
+## UI and quality
+
+- Every canvas node shows an icon, a title, and one truncated description.
+- Validate title, description, comment, message text, attachment type and size, and business-hours ranges before writing them.
+- Drawer open and close stays animated.
+- Do not copy flowchart project source. Custom node components and CSS only.
+- Add or update unit tests when logic or component behavior changes.

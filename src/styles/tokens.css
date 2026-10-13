@@ -1,0 +1,40 @@
+:root {
+  --paper: #f3eee6;
+  --paper-deep: #e7dfd3;
+  --ink: #1d1914;
+  --ink-soft: #5e564c;
+  --card: #fffdf9;
+  --line: rgba(29, 25, 20, 0.1);
+  --coral: #e15a3a;
+  --coral-soft: #fde7df;
+  --teal: #1f8a7b;
+  --teal-soft: #e5f4f1;
+  --gold: #b7791f;
+  --gold-soft: #f8efd8;
+  --violet: #6456c8;
+  --violet-soft: #eeebfb;
+  --danger: #a33b32;
+  --shadow: 0 16px 40px rgba(72, 48, 22, 0.1);
+  --radius: 18px;
+  --font: "Outfit", "Avenir Next", sans-serif;
+  --display: "Fraunces", "Iowan Old Style", serif;
+  color: var(--ink);
+  font-family: var(--font);
+  background: var(--paper);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  margin: 0;
+  height: 100%;
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+
+button { cursor: pointer; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
