@@ -60,28 +60,30 @@ function onFile(event) {
     <p class="hint">Each text stays in the payload. Remove a row to delete it. Images appear as tiles.</p>
     <p v-if="empty" class="error">Add a message or an attachment.</p>
 
-    <div v-for="(item, index) in items" :key="`${item.type}-${index}`">
-      <div v-if="item.type === 'text'" class="text-row">
-        <label class="field">
-          <span>Text</span>
-          <textarea
-            v-model="drafts[index]"
-            rows="3"
-            :data-text-index="`${node.id}-${index}`"
-            @blur="saveText(index)"
-          />
-          <small v-if="errors[index]" class="error">{{ errors[index] }}</small>
-        </label>
-        <button class="ghost" type="button" @click="removeItem(index)">Remove</button>
-      </div>
+    <div v-for="(item, index) in items" :key="`${item.type}-${index}`" class="payload-item">
+      <label v-if="item.type === 'text'" class="field">
+        <span class="field-head">
+          <span class="field-label">Text</span>
+          <button class="chip" type="button" @click="removeItem(index)">Remove</button>
+        </span>
+        <textarea
+          v-model="drafts[index]"
+          rows="4"
+          :data-text-index="`${node.id}-${index}`"
+          @blur="saveText(index)"
+        />
+        <small v-if="errors[index]" class="error">{{ errors[index] }}</small>
+      </label>
       <figure v-else-if="item.type === 'attachment'" class="tile">
         <img :src="item.attachment" alt="" />
-        <figcaption>{{ attachmentName(item.attachment) }}</figcaption>
-        <button class="ghost" type="button" @click="removeItem(index)">Remove</button>
+        <figcaption>
+          <span>{{ attachmentName(item.attachment) }}</span>
+          <button class="chip" type="button" @click="removeItem(index)">Remove</button>
+        </figcaption>
       </figure>
     </div>
 
-    <div class="actions-row" style="margin-top: 12px">
+    <div class="actions-row">
       <button class="ghost" type="button" @click="store.addTextItem(node.id)">Add text</button>
       <label class="upload">
         Upload image

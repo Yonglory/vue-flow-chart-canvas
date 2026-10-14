@@ -33,14 +33,17 @@ function remove() {
   <section class="section" aria-labelledby="comment-fields">
     <h3 id="comment-fields">Comment</h3>
     <label class="field">
-      <span>Existing comment</span>
+      <span class="field-head">
+        <span class="field-label">Existing comment</span>
+        <small>{{ comment.length }}/{{ LIMITS.comment }}</small>
+      </span>
       <textarea
         :id="`comment-${node.id}`"
         v-model="comment"
+        rows="4"
         :maxlength="LIMITS.comment"
         @blur="save"
       />
-      <small class="hint">{{ comment.length }}/{{ LIMITS.comment }}</small>
       <small v-if="error" class="error">{{ error }}</small>
     </label>
     <button class="ghost" type="button" @click="remove">Remove comment</button>

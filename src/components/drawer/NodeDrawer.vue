@@ -79,16 +79,18 @@ function onDelete() {
         <div class="drawer-icon" :class="`tone-${tone}`">
           <NodeIcon :name="tone" />
         </div>
-        <div>
-          <p class="eyebrow">{{ typeLabel(live) }}</p>
+        <div class="drawer__titles">
+          <div class="drawer__meta">
+            <p class="eyebrow">{{ typeLabel(live) }}</p>
+            <button class="close" type="button" @click="emit('close')">Close</button>
+          </div>
           <h2 id="drawer-title">{{ nodeTitle(live) }}</h2>
         </div>
-        <button class="close" type="button" @click="emit('close')">Close</button>
       </header>
 
-      <form @submit.prevent="saveTitle">
+      <form class="drawer-form" @submit.prevent="saveTitle">
         <label class="field">
-          <span>Title</span>
+          <span class="field-label">Title</span>
           <input
             id="node-title"
             v-model="title"
@@ -100,15 +102,19 @@ function onDelete() {
         </label>
 
         <label class="field">
-          <span>Description</span>
+          <span class="field-head">
+            <span class="field-label">Description</span>
+            <small>{{ description.length }}/{{ LIMITS.description }}</small>
+          </span>
           <textarea
             id="node-description"
             v-model="description"
+            rows="4"
             :maxlength="LIMITS.description"
             :aria-invalid="Boolean(errors.description)"
             @blur="saveDescription"
           />
-          <small class="hint">{{ description.length }}/{{ LIMITS.description }}. On the canvas: {{ truncate(nodeDescription(live)) || 'empty' }}</small>
+          <small class="hint">Canvas preview: {{ truncate(nodeDescription(live)) || 'empty' }}</small>
           <small v-if="errors.description" class="error">{{ errors.description }}</small>
         </label>
       </form>

@@ -88,7 +88,7 @@ function commit() {
       </tbody>
     </table>
 
-    <label class="field tz">
+    <label class="field tz-field">
       <span>Time zone</span>
       <select v-model="timezone" aria-label="Time zone" @change="commit">
         <option v-for="zone in zoneOptions" :key="zone" :value="zone">{{ zone }}</option>
